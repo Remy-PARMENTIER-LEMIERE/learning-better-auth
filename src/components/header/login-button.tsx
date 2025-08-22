@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function LoginButton() {
 	return (
-		<>
+		<nav className="flex gap-2">
 			<Link
 				href="/auth/signup"
 				className="text-white h-8 pl-2 pr-2 bg-primary flex items-center justify-center rounded"
@@ -15,6 +15,6 @@ export default function LoginButton() {
 			>
 				Connexion
 			</Link>
-		</>
+		</nav>
 	);
 }
