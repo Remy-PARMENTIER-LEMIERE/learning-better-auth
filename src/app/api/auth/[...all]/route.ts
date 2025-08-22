@@ -45,42 +45,42 @@ async function guardedHandler(req: Request) {
 	const url = new URL(req.url);
 
 	// --- POST /sign-up ---
-	if (req.method === "POST" && url.pathname.endsWith("/sign-up/email")) {
-		const body = await req.json().catch(() => ({}));
-		const parsed = signUpSchema.safeParse(body);
-		if (!parsed.success) {
-			return new Response(
-				JSON.stringify({ error: z.treeifyError(parsed.error) }),
-				{
-					status: 400,
-				},
-			);
-		}
-		req = new Request(req.url, {
-			method: req.method,
-			headers: req.headers,
-			body: JSON.stringify(parsed.data),
-		});
-	}
+	// if (req.method === "POST" && url.pathname.endsWith("/sign-up/email")) {
+	// 	const body = await req.json().catch(() => ({}));
+	// 	const parsed = signUpSchema.safeParse(body);
+	// 	if (!parsed.success) {
+	// 		return new Response(
+	// 			JSON.stringify({ error: z.treeifyError(parsed.error) }),
+	// 			{
+	// 				status: 400,
+	// 			},
+	// 		);
+	// 	}
+	// 	req = new Request(req.url, {
+	// 		method: req.method,
+	// 		headers: req.headers,
+	// 		body: JSON.stringify(parsed.data),
+	// 	});
+	// }
 
 	// --- POST /sign-in ---
-	if (req.method === "POST" && url.pathname.endsWith("/sign-in/email")) {
-		const body = await req.json().catch(() => ({}));
-		const parsed = signInSchema.safeParse(body);
-		if (!parsed.success) {
-			return new Response(
-				JSON.stringify({ error: z.treeifyError(parsed.error) }),
-				{
-					status: 400,
-				},
-			);
-		}
-		req = new Request(req.url, {
-			method: req.method,
-			headers: req.headers,
-			body: JSON.stringify(parsed.data),
-		});
-	}
+	// if (req.method === "POST" && url.pathname.endsWith("/sign-in/email")) {
+	// 	const body = await req.json().catch(() => ({}));
+	// 	const parsed = signInSchema.safeParse(body);
+	// 	if (!parsed.success) {
+	// 		return new Response(
+	// 			JSON.stringify({ error: z.treeifyError(parsed.error).properties }),
+	// 			{
+	// 				status: 400,
+	// 			},
+	// 		);
+	// 	}
+	// 	req = new Request(req.url, {
+	// 		method: req.method,
+	// 		headers: req.headers,
+	// 		body: JSON.stringify(parsed.data),
+	// 	});
+	// }
 
 	return auth.handler(req);
 }

@@ -1,4 +1,5 @@
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 
 export default async function Profile() {
@@ -7,7 +8,7 @@ export default async function Profile() {
 	});
 
 	if (!session) {
-		return <p className="text-destructive">Unauthorized</p>;
+		redirect("/auth/login");
 	}
 
 	console.log(session);
