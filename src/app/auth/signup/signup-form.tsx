@@ -1,12 +1,16 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useId, useState } from "react";
+import { startTransition, useActionState, useEffect, useId } from "react";
 import { toast } from "sonner";
+import { signUpEmailAction } from "@/actions/auth/sign-up-email.action";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { signUp } from "@/lib/auth-client";
+
+// import { signUp } from "@/lib/auth-client";
+
+const initialState = { status: "", message: "" };
 
 export default function SignupForm() {
 	const router = useRouter();
@@ -16,7 +20,11 @@ export default function SignupForm() {
 	const confirmPasswordId = useId();
 	const passwordPattern =
 		"^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^a-zA-Z\\d]).{8,}$";
-	const [isPending, setIsPending] = useState(false);
+	// const [isPending, setIsPending] = useState(false);
+	const [state, action, isPending] = useActionState(
+		signUpEmailAction,
+		initialState,
+	);
 
 	// Votre fonction de validation côté client
 	async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -37,31 +45,46 @@ export default function SignupForm() {
 			toast.error("Les mots de passe ne correspondent pas.");
 			return;
 		}
+		startTransition(() => {
+			// lancer l'action dans une transition pour que isPending s'active
+			action(formData);
+		});
 
-		await signUp.email(
-			{
-				email,
-				password,
-				name,
-			},
-			{
-				onRequest: () => {
-					toast.loading("Création du compte...");
-					setIsPending(true);
-				},
-				onResponse: () => {
-					toast.dismiss();
-					setIsPending(false);
-				},
-				onSuccess: () => {
-					router.push("/auth/login");
-				},
-				onError: (ctx) => {
-					toast.error(ctx.error.message);
-				},
-			},
-		);
+		// await signUp.email(
+		// 	{
+		// 		email,
+		// 		password,
+		// 		name,
+		// 	},
+		// 	{
+		// 		onRequest: () => {
+		// 			toast.loading("Création du compte...");
+		// 			setIsPending(true);
+		// 		},
+		// 		onResponse: () => {
+		// 			toast.dismiss();
+		// 			setIsPending(false);
+		// 		},
+		// 		onSuccess: () => {
+		// 			router.push("/auth/login");
+		// 		},
+		// 		onError: (ctx) => {
+		// 			toast.error(ctx.error.message);
+		// 		},
+		// 	},
+		// );
 	}
+
+	useEffect(() => {
+		if (!state) return;
+		if (state.status === "error") {
+			toast.error(state.message);
+		}
+		if (state.status === "success") {
+			toast.success(state.message);
+			router.push("/auth/login");
+		}
+	}, [state, router]);
 
 	return (
 		<form onSubmit={handleSubmit} className="space-y-4">

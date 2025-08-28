@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import type { auth } from "@/lib/auth";
 
 type Children = {
 	children: ReactNode;
@@ -28,3 +29,5 @@ type AuthContextType = {
 	} | null;
 	isPending: boolean;
 };
+
+type ErrorCode = keyof typeof auth.$ERROR_CODES | "UNKNOWN";

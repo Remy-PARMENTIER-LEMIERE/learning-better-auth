@@ -1,48 +1,15 @@
 import * as argon2 from "argon2";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import { createAuthMiddleware } from "better-auth/api";
+import { APIError, createAuthMiddleware } from "better-auth/api";
 import { z } from "zod";
 import { prisma } from "./prisma";
-
-const signUpSchema = z.object({
-	name: z.string().min(1).max(80),
-	email: z.email(),
-	password: z
-		.string()
-		.min(8, "Min 8 caractères")
-		.max(20)
-		.refine(
-			(pwd) =>
-				/[a-z]/.test(pwd) &&
-				/[A-Z]/.test(pwd) &&
-				/\d/.test(pwd) &&
-				/[^a-zA-Z0-9\s]/.test(pwd),
-			{
-				message:
-					"Doit contenir une minuscule, une majuscule, un chiffre et un caractère spécial",
-			},
-		),
-});
-
-const signInSchema = z.object({
-	email: z.email(),
-	password: z
-		.string()
-		.min(8, "Min 8 caractères")
-		.max(20)
-		.refine(
-			(pwd) =>
-				/[a-z]/.test(pwd) &&
-				/[A-Z]/.test(pwd) &&
-				/\d/.test(pwd) &&
-				/[^a-zA-Z0-9\s]/.test(pwd),
-			{
-				message:
-					"Doit contenir une minuscule, une majuscule, un chiffre et un caractère spécial",
-			},
-		),
-});
+import {
+	normalizeName,
+	signInSchema,
+	signUpSchema,
+	VALID_DOMAINS,
+} from "./utils";
 
 export const auth = betterAuth({
 	database: prismaAdapter(prisma, {
@@ -85,7 +52,23 @@ export const auth = betterAuth({
 						},
 					);
 				}
-				ctx.body = parsed.data;
+
+				const email = String(parsed.data.email);
+				const domain = email.split("@")[1];
+
+				if (!VALID_DOMAINS().includes(domain)) {
+					throw new APIError("BAD_REQUEST", {
+						status: "error",
+						message:
+							"Nom de domaine invalide. Veuillez utiliser un email valide.",
+					});
+				}
+				const name = normalizeName(parsed.data.name);
+				console.log(name);
+
+				ctx.body = { ...parsed.data, name };
+				console.log(ctx.body);
+				return ctx;
 			}
 
 			if (ctx.path === "/sign-in/email") {

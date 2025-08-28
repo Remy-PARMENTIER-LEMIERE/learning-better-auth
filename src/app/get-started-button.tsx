@@ -10,7 +10,11 @@ export default function GetStartedButton() {
 
 	return (
 		<>
-			<Button asChild size="lg">
+			<Button
+				asChild
+				size="lg"
+				className={isPending ? "pointer-events-none opacity-50" : undefined}
+			>
 				<Link href={href}>
 					{isPending ? "Loading..." : session ? "Get Started" : "Sign Up"}
 				</Link>
