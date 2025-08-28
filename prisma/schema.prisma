@@ -28,12 +28,18 @@ model Post {
   @@map(name: "posts")
 }
 
+enum UserRole {
+  USER
+  ADMIN
+}
+
 model User {
-  id            String  @id @default(cuid())
-  name          String  @db.Text
+  id            String   @id @default(cuid())
+  name          String   @db.Text
   email         String
   emailVerified Boolean
-  image         String? @db.Text
+  role          UserRole @default(USER)
+  image         String?  @db.Text
 
   createdAt DateTime
   updatedAt DateTime

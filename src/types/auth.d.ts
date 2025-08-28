@@ -12,6 +12,7 @@ type AuthContextType = {
 			email: string;
 			emailVerified: boolean;
 			name: string;
+			role: "USER" | "ADMIN";
 			createdAt: Date;
 			updatedAt: Date;
 			image?: string | null | undefined;

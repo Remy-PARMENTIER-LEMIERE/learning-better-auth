@@ -1,5 +1,6 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import ReturnButton from "@/components/return-button/return-button";
 import { auth } from "@/lib/auth";
 
 export default async function Profile() {
@@ -11,11 +12,15 @@ export default async function Profile() {
 		redirect("/auth/login");
 	}
 
-	console.log(session);
-
 	return (
 		<main className="px-8 py-16 container mx-auto max-w-screen-lg space-y-8">
 			<section className="space-y-8">
+				{session.user.role === "ADMIN" && (
+					<ReturnButton
+						href="/admin/dashboard"
+						label="Retour au tableau de bord"
+					/>
+				)}
 				<h1 className="text-3xl font-bold">Profile</h1>
 			</section>
 
