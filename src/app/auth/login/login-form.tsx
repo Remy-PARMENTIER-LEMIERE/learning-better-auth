@@ -6,14 +6,12 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useAuth } from "@/lib/AuthContext";
 import { signIn } from "@/lib/auth-client";
 
 export default function LoginForm() {
 	const emailId = useId();
 	const passwordId = useId();
 	const router = useRouter();
-	const { setIsLogged } = useAuth();
 
 	const passwordPattern =
 		"^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^a-zA-Z\\d]).{8,}$";
@@ -41,7 +39,7 @@ export default function LoginForm() {
 					router.refresh();
 				},
 				onSuccess: () => {
-					setIsLogged(true);
+					router.refresh();
 					router.push("/profile");
 				},
 				onError: (err) => {
