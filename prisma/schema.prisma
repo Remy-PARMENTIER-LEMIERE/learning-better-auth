@@ -41,8 +41,11 @@ model User {
   role          UserRole @default(USER)
   image         String?  @db.Text
 
-  createdAt DateTime
-  updatedAt DateTime
+  banned     Boolean?
+  banReason  String?   @db.Text
+  banExpires DateTime?
+  createdAt  DateTime
+  updatedAt  DateTime
 
   sessions Session[]
   accounts Account[]
@@ -60,8 +63,9 @@ model Session {
   createdAt DateTime
   updatedAt DateTime
 
-  ipAddress String? @db.Text
-  userAgent String? @db.Text
+  ipAddress      String? @db.Text
+  userAgent      String? @db.Text
+  impersonatedBy String? @db.Text
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)

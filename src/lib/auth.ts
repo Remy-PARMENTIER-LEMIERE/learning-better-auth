@@ -2,7 +2,11 @@ import * as argon2 from "argon2";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { APIError, createAuthMiddleware } from "better-auth/api";
+import { nextCookies } from "better-auth/next-js";
+import { admin } from "better-auth/plugins";
 import { z } from "zod";
+import { UserRole } from "@/generated/prisma";
+import { ac, roles } from "@/lib/permissions";
 import { prisma } from "./prisma";
 import {
 	normalizeName,
@@ -33,6 +37,25 @@ export const auth = betterAuth({
 				} catch {
 					return false;
 				}
+			},
+		},
+	},
+	databaseHooks: {
+		user: {
+			create: {
+				before: async (user) => {
+					if (!user.email) {
+						return false;
+					}
+
+					const ADMIN_EMAILS = process.env.ADMIN_EMAILS?.split(";") ?? [];
+
+					if (ADMIN_EMAILS.includes(user.email)) {
+						return { data: { ...user, role: "ADMIN" } };
+					}
+
+					return { data: user };
+				},
 			},
 		},
 	},
@@ -72,7 +95,6 @@ export const auth = betterAuth({
 					});
 				}
 				const name = normalizeName(parsed.data.name);
-				console.log(name);
 
 				ctx.body = { ...parsed.data, name };
 				console.log(ctx.body);
@@ -94,4 +116,13 @@ export const auth = betterAuth({
 			}
 		}),
 	},
+	plugins: [
+		nextCookies(),
+		admin({
+			defaultRole: UserRole.USER,
+			adminRoles: [UserRole.ADMIN],
+			ac,
+			roles,
+		}),
+	],
 });

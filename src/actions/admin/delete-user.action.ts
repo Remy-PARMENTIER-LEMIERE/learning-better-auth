@@ -9,8 +9,10 @@ export async function deleteUser(
 	userId: string,
 	_state: { status: string; message: string },
 ) {
+	const headersList = await headers();
+
 	const session = await auth.api.getSession({
-		headers: await headers(),
+		headers: headersList,
 	});
 
 	if (!session || session.user.role !== "ADMIN" || session.user.id === userId) {
@@ -30,7 +32,7 @@ export async function deleteUser(
 		}
 
 		const deletedUser = await prisma.user.delete({
-			where: { id: userId },
+			where: { id: userId, role: "USER" },
 		});
 
 		if (!deletedUser) {
@@ -46,9 +48,15 @@ export async function deleteUser(
 			message: `Utilisateur ${userToDelete.name} supprimé.`,
 		};
 	} catch (error) {
+		if (error instanceof Error) {
+			return {
+				status: "error",
+				message: error.message,
+			};
+		}
 		return {
 			status: "error",
-			message: String(error),
+			message: "Oups something went wrong !😯",
 		};
 	}
 }

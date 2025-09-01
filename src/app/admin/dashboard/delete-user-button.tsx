@@ -34,8 +34,9 @@ export function DeleteUserButton({ userId }: { userId: string }) {
 				size="icon"
 				variant="destructive"
 				aria-label="Delete user"
-				className="size-7 rounded-sm grayscale-25 hover:grayscale-0 duration-300"
+				className="size-7 rounded-sm grayscale-25 hover:grayscale-0 duration-300 hover:cursor-pointer"
 				disabled={isPending}
+				title={isPending ? "Suppression en cours..." : "Supprimer"}
 			>
 				<span className="sr-only">DELETE</span>
 				<TrashIcon />
@@ -52,7 +53,6 @@ export function PlaceHolderDeleteUserButton() {
 			aria-label="Delete user"
 			className="size-7 rounded-sm grayscale-25 hover:grayscale-0 duration-300"
 			disabled
-			title="Unauthorized"
 		>
 			<span className="sr-only">DELETE</span>
 			<TrashIcon />
