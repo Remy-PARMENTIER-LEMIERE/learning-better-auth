@@ -152,3 +152,13 @@
   - Change Permissions (With Posts)
 - Create Dropdown to Change Role for Admins
 - FINISH PART 4
+
+== PART 5 ==
+
+- Google OAuth
+  - Create Buttons
+- GitHub OAuth
+- Account Linking
+- Error Handling
+  - `/auth/login/error`
+- FINISH PART 5
