@@ -1,8 +1,8 @@
 "use server";
 
 import { APIError } from "better-auth/api";
-import { auth } from "@/lib/auth";
-// import { signUp } from "@/lib/auth-client";
+// import { auth } from "@/lib/auth";
+import { signUp } from "@/lib/auth-client";
 
 export async function signUpEmailAction(
 	_state: { status: string; message: string },
@@ -17,17 +17,35 @@ export async function signUpEmailAction(
 
 		// La validation et la normalisation sont gérées par le middleware `auth.ts`.
 		// Ici, on se contente d'appeler l'API avec les valeurs reçues.
-		await auth.api.signUpEmail({
-			body: {
-				name,
-				email,
-				password,
+		// await auth.api.signUpEmail({
+		// 	body: {
+		// 		name,
+		// 		email,
+		// 		password,
+		// 	},
+		// });
+
+		const res = { status: "", message: "" };
+
+		await signUp.email({
+			name,
+			email,
+			password,
+			fetchOptions: {
+				onError(ctx) {
+					res.status = "error";
+					res.message = ctx.error.message;
+				},
+				onSuccess: () => {
+					res.status = "success";
+					res.message = "Compte créé";
+				},
 			},
 		});
 
-		// await signUp.email({ name, email, password, fetchOptions: {} });
+		return res;
 
-		return { status: "success", message: "Compte créé" };
+		// return { status: "success", message: "Compte créé" };
 	} catch (error: unknown) {
 		if (error instanceof APIError) {
 			const errCode = error.body ? error.body.code : "UNKNOWN";

@@ -56,6 +56,17 @@ export const auth = betterAuth({
 			},
 		},
 		requireEmailVerification: true,
+		sendResetPassword: async ({ user, url }) => {
+			await sendEmailAction({
+				to: user.email,
+				subject: "Réinitialisez votre mot de passe",
+				meta: {
+					description:
+						"Cliquez sur le lien ci-dessous pour réinitialiser votre mot de passe.",
+					link: String(url),
+				},
+			});
+		},
 	},
 	emailVerification: {
 		sendOnSignUp: true,
@@ -90,7 +101,9 @@ export const auth = betterAuth({
 						return { data: { ...user, role: "ADMIN" } };
 					}
 
-					return { data: user };
+					const normalizedName = normalizeName(user.name);
+
+					return { data: { ...user, name: normalizedName } };
 				},
 			},
 		},
@@ -130,11 +143,6 @@ export const auth = betterAuth({
 							"Nom de domaine invalide. Veuillez utiliser un email valide.",
 					});
 				}
-				const name = normalizeName(parsed.data.name);
-
-				ctx.body = { ...parsed.data, name };
-
-				return ctx;
 			}
 
 			if (ctx.path === "/sign-in/email") {

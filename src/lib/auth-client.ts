@@ -4,7 +4,7 @@ import type { auth } from "@/lib/auth";
 import { ac, roles } from "@/lib/permissions";
 
 const authClient = createAuthClient({
-	baseURL: process.env.NEXTPUBLIC_API_URL,
+	// baseURL: process.env.NEXTPUBLIC_API_URL,
 	plugins: [
 		inferAdditionalFields<typeof auth>(),
 		adminClient({
@@ -21,4 +21,6 @@ export const {
 	useSession,
 	admin,
 	sendVerificationEmail,
+	forgetPassword,
+	resetPassword,
 } = authClient;

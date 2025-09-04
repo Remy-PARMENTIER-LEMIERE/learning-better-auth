@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useId } from "react";
 import { toast } from "sonner";
@@ -91,9 +92,17 @@ export default function LoginForm() {
 			</div>
 
 			<div className="space-y-2">
-				<Label htmlFor={passwordId} className="cursor-pointer">
-					Mot de passe
-				</Label>
+				<div className="flex justify-between items-center gap-2">
+					<Label htmlFor={passwordId} className="cursor-pointer">
+						Mot de passe
+					</Label>
+					<Link
+						href="/auth/forgot-password"
+						className="text-sm italic text-muted-foreground hover:underline underline-offset-2 hover:text-foreground"
+					>
+						Mot de passe oublié ?
+					</Link>
+				</div>
 				<Input
 					id={passwordId}
 					name="password"
