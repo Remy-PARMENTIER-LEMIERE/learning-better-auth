@@ -8,8 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-// import { signUp } from "@/lib/auth-client";
-
 const initialState = { status: "", message: "" };
 
 export default function SignupForm() {
@@ -20,13 +18,12 @@ export default function SignupForm() {
 	const confirmPasswordId = useId();
 	const passwordPattern =
 		"^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^a-zA-Z\\d]).{8,}$";
-	// const [isPending, setIsPending] = useState(false);
 	const [state, action, isPending] = useActionState(
 		signUpEmailAction,
 		initialState,
 	);
 
-	// Votre fonction de validation côté client
+	// Votre fonction de soumission côté client
 	async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
 		event.preventDefault();
 		const formData = new FormData(event.currentTarget);
@@ -46,33 +43,8 @@ export default function SignupForm() {
 			return;
 		}
 		startTransition(() => {
-			// lancer l'action dans une transition pour que isPending s'active
 			action(formData);
 		});
-
-		// await signUp.email(
-		// 	{
-		// 		email,
-		// 		password,
-		// 		name,
-		// 	},
-		// 	{
-		// 		onRequest: () => {
-		// 			toast.loading("Création du compte...");
-		// 			setIsPending(true);
-		// 		},
-		// 		onResponse: () => {
-		// 			toast.dismiss();
-		// 			setIsPending(false);
-		// 		},
-		// 		onSuccess: () => {
-		// 			router.push("/auth/login");
-		// 		},
-		// 		onError: (ctx) => {
-		// 			toast.error(ctx.error.message);
-		// 		},
-		// 	},
-		// );
 	}
 
 	useEffect(() => {
@@ -82,7 +54,7 @@ export default function SignupForm() {
 		}
 		if (state.status === "success") {
 			toast.success(state.message);
-			router.push("/auth/login");
+			router.push("/auth/signup/success");
 		}
 	}, [state, router]);
 

@@ -162,3 +162,22 @@
 - Error Handling
   - `/auth/login/error`
 - FINISH PART 5
+
+== PART 6 ==
+
+- Nodemailer
+  - Create Template
+- Verify Email
+  - `emailAndPassword.requireEmailVerification`
+  - `emailVerification`
+  - Handle Error / Expired `/auth/verify`
+  - Destructure sendVerificationEmail
+  - Handle Login Page Not Verified
+- Create Post Sign Up Page
+  - Showcase
+- Forgot Password
+  - Page / Form / Success
+- Reset Password
+  - Page / Form / Success
+  - Showcase
+- FINISH PART 6

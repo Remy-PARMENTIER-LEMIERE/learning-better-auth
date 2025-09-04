@@ -3,6 +3,13 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import type { UserRole } from "@/generated/prisma";
 import { admin } from "@/lib/auth-client";
 import type { UserRoleSelectProps } from "@/types/user";
@@ -10,18 +17,20 @@ import type { UserRoleSelectProps } from "@/types/user";
 export default function UserRoleSelect({ userId, role }: UserRoleSelectProps) {
 	const [isPending, setIsPending] = useState(false);
 	const router = useRouter();
+	const [value, setValue] = useState(role);
 
-	async function handleChange(event: React.ChangeEvent<HTMLSelectElement>) {
+	async function handleChange(value: string) {
 		setIsPending(true);
 
-		const newRole = event.target.value as UserRole;
+		const newRole = value as UserRole;
 
 		const canChangeRole = await admin.hasPermission({
 			permissions: { user: ["set-role"] },
 		});
 
-		if (!canChangeRole.error) {
+		if (canChangeRole.error) {
 			toast.error("Vous n'avez pas la permission de changer ce rôle.");
+			router.refresh();
 			return;
 		}
 
@@ -41,7 +50,7 @@ export default function UserRoleSelect({ userId, role }: UserRoleSelectProps) {
 				onSuccess: (ctx) => {
 					if (ctx.data.user.role === newRole) {
 						toast.success(`${ctx.data.user.name}: Rôle mis à jour.`);
-						router.refresh();
+						setValue(newRole);
 					} else {
 						toast.error(
 							ctx.data?.message || "Échec de la mise à jour du rôle.",
@@ -54,14 +63,18 @@ export default function UserRoleSelect({ userId, role }: UserRoleSelectProps) {
 	}
 
 	return (
-		<select
-			value={role}
-			onChange={handleChange}
+		<Select
 			disabled={role === "ADMIN" || isPending}
-			className="px-3 py-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+			value={value}
+			onValueChange={handleChange}
 		>
-			<option value="USER">User</option>
-			<option value="ADMIN">Admin</option>
-		</select>
+			<SelectTrigger>
+				<SelectValue placeholder="Select a role" />
+			</SelectTrigger>
+			<SelectContent>
+				<SelectItem value="USER">User</SelectItem>
+				<SelectItem value="ADMIN">Admin</SelectItem>
+			</SelectContent>
+		</Select>
 	);
 }

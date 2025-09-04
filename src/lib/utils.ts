@@ -62,3 +62,5 @@ export const signInSchema = z.object({
 			},
 		),
 });
+
+export const emailSchema = z.object({ email: z.email() });

@@ -5,6 +5,7 @@ import { APIError, createAuthMiddleware } from "better-auth/api";
 import { nextCookies } from "better-auth/next-js";
 import { admin } from "better-auth/plugins";
 import { z } from "zod";
+import { sendEmailAction } from "@/actions/nodemailer/send-email.action";
 import { UserRole } from "@/generated/prisma";
 import { ac, roles } from "@/lib/permissions";
 import { prisma } from "./prisma";
@@ -31,7 +32,7 @@ export const auth = betterAuth({
 	},
 	account: {
 		accountLinking: {
-			enabled: false,
+			enabled: true,
 		},
 	},
 	emailAndPassword: {
@@ -53,6 +54,26 @@ export const auth = betterAuth({
 					return false;
 				}
 			},
+		},
+		requireEmailVerification: true,
+	},
+	emailVerification: {
+		sendOnSignUp: true,
+		expiresIn: 60 * 60,
+		autoSignInAfterVerification: true,
+		sendVerificationEmail: async ({ user, url }) => {
+			const link = new URL(url);
+			link.searchParams.set("callbackURL", "/auth/verify");
+
+			await sendEmailAction({
+				to: user.email,
+				subject: "Verify your email address",
+				meta: {
+					description:
+						"Please verify your email address to complete registration.",
+					link: String(link),
+				},
+			});
 		},
 	},
 	databaseHooks: {
@@ -103,7 +124,7 @@ export const auth = betterAuth({
 				const domain = email.split("@")[1];
 
 				if (!VALID_DOMAINS().includes(domain)) {
-					throw new APIError("BAD_REQUEST", {
+					throw new APIError(400, {
 						status: "error",
 						message:
 							"Nom de domaine invalide. Veuillez utiliser un email valide.",
@@ -112,7 +133,7 @@ export const auth = betterAuth({
 				const name = normalizeName(parsed.data.name);
 
 				ctx.body = { ...parsed.data, name };
-				console.log(ctx.body);
+
 				return ctx;
 			}
 

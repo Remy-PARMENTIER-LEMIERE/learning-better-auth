@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { signIn } from "@/lib/auth-client";
+import { signInSchema } from "@/lib/utils";
 
 export default function LoginForm() {
 	const emailId = useId();
@@ -25,31 +26,53 @@ export default function LoginForm() {
 			return;
 		}
 
-		await signIn.email(
-			{
-				email: String(email),
-				password: String(password),
+		const safeData = signInSchema.safeParse({
+			email: String(email),
+			password: String(password),
+		});
+
+		if (!safeData.success) {
+			toast.error("Veuillez vérifier vos informations.");
+			return;
+		}
+
+		await signIn.email(safeData.data, {
+			onRequest: () => {
+				toast.loading("Connexion en cours...");
 			},
-			{
-				onRequest: () => {
-					toast.loading("Connexion en cours...");
-				},
-				onResponse: () => {
-					toast.dismiss();
-					router.refresh();
-				},
-				onSuccess: () => {
-					router.refresh();
-					router.push("/profile");
-				},
-				onError: (err) => {
-					toast.error(
-						err.error.message ||
-							"Une erreur est survenue lors de la connexion.",
-					);
-				},
+			onResponse: () => {
+				toast.dismiss();
+				router.refresh();
 			},
-		);
+			onSuccess: () => {
+				router.refresh();
+				router.push("/profile");
+			},
+			onError: (ctx) => {
+				switch (ctx.error.code) {
+					case "INVALID_CREDENTIALS":
+						toast.error("Identifiants invalides.");
+						break;
+					case "USER_NOT_FOUND":
+						toast.error("Utilisateur non trouvé.");
+						break;
+					case "EMAIL_NOT_VERIFIED":
+						router.push("/auth/verify?error=email_not_verified");
+						break;
+					case "INVALID_EMAIL_OR_PASSWORD":
+						toast.error("Email ou mot de passe invalide.");
+						break;
+					case "TOO_MANY_REQUESTS":
+						toast.error("Trop de demandes. Veuillez réessayer plus tard.");
+						break;
+					case "NETWORK_ERROR":
+						toast.error("Erreur réseau. Veuillez vérifier votre connexion.");
+						break;
+					default:
+						toast.error("Une erreur est survenue.");
+				}
+			},
+		});
 	}
 
 	return (
