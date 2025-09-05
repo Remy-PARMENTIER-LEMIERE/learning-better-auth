@@ -1,36 +1,23 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+There is a projet that was made to learn Better Auth.
 
-## Getting Started
+# Better Authy
 
-First, run the development server:
+The project was made following the tutorial : https://www.youtube.com/watch?v=N4meIif7Jtc
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+The prupose was to learn Better Auth, discovering a few other tools as nodemailer, tailwind, shadcn and zod.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+For history, I've started to learn Nextjs and Prisma barely a month ago ! It might not be perfect, I've tried different ways of doing things but things are working great !
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Features
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Email&Password SignIn, Log In/Out.
+- Google Sign/Log In
+- GitHub Sign/Log In
+- Email Verification
+- Setup Roles
+- Admin DashBoard (List users, Set Roles, Delete Users)
+- Permissions
+- Update User
+- Forgot Password
+- Change Password
+- Datas are of course controlled and/or modified before submit to database.

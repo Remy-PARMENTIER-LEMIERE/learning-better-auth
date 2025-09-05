@@ -64,3 +64,21 @@ export const signInSchema = z.object({
 });
 
 export const emailSchema = z.object({ email: z.email() });
+
+export const passwordSchema = z.object({
+	password: z
+		.string()
+		.min(8, "Min 8 caractères")
+		.max(20)
+		.refine(
+			(pwd) =>
+				/[a-z]/.test(pwd) &&
+				/[A-Z]/.test(pwd) &&
+				/\d/.test(pwd) &&
+				/[^a-zA-Z0-9\s]/.test(pwd),
+			{
+				message:
+					"Doit contenir une minuscule, une majuscule, un chiffre et un caractère spécial",
+			},
+		),
+});
