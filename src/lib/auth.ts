@@ -1,9 +1,9 @@
 import * as argon2 from "argon2";
-import { betterAuth } from "better-auth";
+import { type BetterAuthOptions, betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { APIError, createAuthMiddleware } from "better-auth/api";
 import { nextCookies } from "better-auth/next-js";
-import { admin } from "better-auth/plugins";
+import { admin, customSession, magicLink } from "better-auth/plugins";
 import { z } from "zod";
 import { sendEmailAction } from "@/actions/nodemailer/send-email.action";
 import { UserRole } from "@/generated/prisma";
@@ -16,7 +16,7 @@ import {
 	VALID_DOMAINS,
 } from "./utils";
 
-export const auth = betterAuth({
+const options = {
 	database: prismaAdapter(prisma, {
 		provider: "mysql",
 	}),
@@ -118,6 +118,7 @@ export const auth = betterAuth({
 	},
 	session: {
 		expiresIn: 30 * 24 * 60 * 60,
+		cookieCache: { enabled: true, maxAge: 10 * 60 },
 	},
 	hooks: {
 		before: createAuthMiddleware(async (ctx) => {
@@ -158,6 +159,30 @@ export const auth = betterAuth({
 				}
 				ctx.body = parsed.data;
 			}
+
+			if (ctx.path === "/sign-in/magic-link") {
+				const name = normalizeName(ctx.body.name);
+
+				return {
+					...ctx,
+					body: {
+						...ctx.body,
+						name,
+					},
+				};
+			}
+
+			if (ctx.path === "/update-user") {
+				const name = normalizeName(ctx.body.name);
+
+				return {
+					...ctx,
+					body: {
+						...ctx.body,
+						name,
+					},
+				};
+			}
 		}),
 	},
 	plugins: [
@@ -168,5 +193,41 @@ export const auth = betterAuth({
 			ac,
 			roles,
 		}),
+		magicLink({
+			sendMagicLink: async ({ email, url }) => {
+				await sendEmailAction({
+					to: email,
+					subject: "Magic Link Login",
+					meta: {
+						description: "Click the link bellow to login with the magic link !",
+						link: String(url),
+					},
+				});
+			},
+		}),
+	],
+} satisfies BetterAuthOptions;
+
+export const auth = betterAuth({
+	...options,
+	plugins: [
+		...(options.plugins ?? []),
+		customSession(async ({ user, session }) => {
+			return {
+				session: {
+					expiresAt: session.expiresAt,
+					token: session.token,
+					userAgent: session.userAgent,
+				},
+				user: {
+					id: user.id,
+					name: user.name,
+					email: user.email,
+					image: user.image,
+					createdAt: user.createdAt,
+					role: user.role,
+				},
+			};
+		}, options),
 	],
 });

@@ -1,4 +1,5 @@
 import LoginForm from "./login-form";
+import MagicLinkLoginForm from "./magic-link-login-form";
 import SignInOAuthButton from "./sign-in-oauth-button";
 
 export default function Page() {
@@ -12,6 +13,8 @@ export default function Page() {
 					<SignInOAuthButton provider="google" />
 					<SignInOAuthButton provider="github" />
 				</div>
+				<hr className="max-w-sm mx-auto" />
+				<MagicLinkLoginForm />
 			</section>
 		</main>
 	);
